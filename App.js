@@ -56,7 +56,7 @@ export default function App() {
         <Image  style={styles.preview} source={{uri: "data:image/jpg;base64," + photo.base64}} />
         <Button title="share" onPress={sharePic}/>
         {hasMediaLibraryPermission ? <Button title="save" onPress={savePhoto} /> 
-        : undefined}
+          : undefined}
         <Button title="Discard" onPress={() => setPhoto(undefined)}/>
       </SafeAreaView>
     );
