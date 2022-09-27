@@ -1,10 +1,10 @@
-import React,{useState, useEffect} from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
+import {useState, useEffect, useRef} from 'react'
 import { StyleSheet, Text, View, SafeAreaView, Button, Image} from 'react-native';
 import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
-import * as Medialibrary from 'expo-media-library';
-import { Button } from 'react-native-web';
+import * as MediaLibrary from 'expo-media-library';
 
 
 export default function App() {
@@ -17,14 +17,14 @@ export default function App() {
   useEffect(()=> {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
-      const mediaLibraryPermission = await Medialibrary.requestPermissionsAsync();
+      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
     })();
   }, []);
 
   if(hasCameraPermission === undefined){
-    return <Text>Request permission...</Text>
+    return <Text>Requesting permission...</Text>
   }else if (!hasCameraPermission){
     return <Text>Permission for camera not granted. Please change this in settings.</Text>
   }
@@ -41,16 +41,23 @@ export default function App() {
 
   if (photo) {
     let sharePic = () =>{
-
+      shareAsync(photo.uri).then(() => {
+        setPhoto(undefined);
+      });
     };
 
     let savePhoto = () => {
-
+      MediaLibrary.saveToLibraryAsync(photo.uri).then(() => {
+        setPhoto(undefined);
+      });
     };
     return(
       <SafeAreaView  style={styles.container}>
         <Image  style={styles.preview} source={{uri: "data:image/jpg;base64," + photo.base64}} />
-        <Button />
+        <Button title="share" onPress={sharePic}/>
+        {hasMediaLibraryPermission ? <Button title="save" onPress={savePhoto} /> 
+        : undefined}
+        <Button title="Discard" onPress={() => setPhoto(undefined)}/>
       </SafeAreaView>
     );
   }
